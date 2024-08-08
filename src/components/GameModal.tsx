@@ -2,29 +2,28 @@ import { ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Modal, Input
 
 type GameModalProps = {
   isOpen: boolean;
-  message: string;
+  title: string;
   acceptAction: () => void;
 }
-export const GameModal = ({isOpen, message, acceptAction }: GameModalProps) => {
+export const GameModal = ({isOpen, title, acceptAction }: GameModalProps) => {
     return <Modal isOpen={isOpen} >
     <ModalContent>
       {(onClose) => (
         <>
-          <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
           <ModalBody>
           <Input
-      label={message}
-      placeholder=' dvd'
+      label='Nombre de la mesa'
       type='text'
       onInput={() => {}}
     />
           </ModalBody>
           <ModalFooter>
             <Button color="danger" variant="light" onPress={onClose}>
-              Close
+              Volver
             </Button>
             <Button color="primary" onPress={acceptAction}>
-              Action
+              Aceptar
             </Button>
           </ModalFooter>
         </>
