@@ -3,7 +3,7 @@ import { ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Modal, Input
 type GameModalProps = {
   isOpen: boolean;
   message: string;
-  acceptAction: () => object;
+  acceptAction: () => void;
 }
 export const GameModal = ({isOpen, message, acceptAction }: GameModalProps) => {
     return <Modal isOpen={isOpen} >
