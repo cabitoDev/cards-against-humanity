@@ -12,7 +12,7 @@ export const useNewGame = (tableName: string, playerName: string) => {
 
   const createGame = async () => {
     await gameApi.post('/', newGame)
-    navigate(`/game/${tableName}`)
+    navigate(`/table`)
   }
 
   return { createGame }

@@ -1,6 +1,8 @@
 import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { Lobby } from '../pages/Lobby'
 import { GameMenu } from '../pages/GameMenu'
+import { Play } from '../pages/Play'
+import { Cards } from '../pages/Cards'
 
 export const GameRouter = () => {
   const router = createBrowserRouter([
@@ -13,8 +15,18 @@ export const GameRouter = () => {
       element: <Navigate to={'/lobby'} />
     },
     {
-      path: '/game/:gameId',
+      path: '/table',
       element: <GameMenu />
+    },
+
+    {
+      path: 'table/cards',
+      element: <Cards />
+    },
+
+    {
+      path: 'table/play',
+      element: <Play />
     }
   ])
 
