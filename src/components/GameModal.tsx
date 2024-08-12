@@ -7,17 +7,20 @@ import {
   Modal,
   Input
 } from '@nextui-org/react'
+import { Dispatch, SetStateAction } from 'react'
 
 type GameModalProps = {
   isOpen: boolean
   title: string
   acceptAction: () => void
+  setTableName: Dispatch<SetStateAction<string>>
   onClose: () => void
 }
 export const GameModal = ({
   isOpen,
   title,
   acceptAction,
+  setTableName,
   onClose
 }: GameModalProps) => {
   return (
@@ -25,7 +28,11 @@ export const GameModal = ({
       <ModalContent>
         <ModalHeader className='flex flex-col gap-1'>{title}</ModalHeader>
         <ModalBody>
-          <Input label='Nombre de la mesa' type='text' onInput={() => {}} />
+          <Input
+            label='Nombre de la mesa'
+            type='text'
+            onInput={ev => setTableName(ev.currentTarget.value)}
+          />
         </ModalBody>
         <ModalFooter>
           <Button color='danger' variant='light' onPress={onClose}>
