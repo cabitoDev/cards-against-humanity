@@ -2,6 +2,7 @@ import { Button, Input } from '@nextui-org/react'
 import { GameModal } from '../components/GameModal'
 import { useState } from 'react'
 import { useNewGame } from '../hooks/useNewGame'
+import { useJoinGame } from '../hooks/useJoinGame'
 
 export const Lobby = () => {
   const [openModal, setOpenModal] = useState<'ENTER' | 'CREATE'>()
@@ -9,10 +10,11 @@ export const Lobby = () => {
   const [tableName, setTableName] = useState<string>('')
 
   const { createGame } = useNewGame(tableName, playerName)
+  const { joinGame } = useJoinGame()
   const modals = {
     ENTER: {
       message: 'Introduce el código de tu mesa',
-      acceptAction: () => {}
+      acceptAction: () => joinGame(tableName, playerName)
     },
     CREATE: {
       message: 'Introduce un nombre para crear una mesa',

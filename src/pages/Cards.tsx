@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux'
 import { useUpdateGame } from '../hooks/useUpdateGame'
 import { useState } from 'react'
 import { CardType, stateType } from '../model/GameModel'
+import { useNavigate } from 'react-router-dom'
 
 export const Cards = () => {
+  const navigate = useNavigate()
   const game = useSelector((state: stateType) => state.game)
   const [newCard, setNewCard] = useState('')
   const { putGame } = useUpdateGame()
@@ -43,6 +45,9 @@ export const Cards = () => {
         }}
       >
         Agregar
+      </Button>
+      <Button color='primary' onClick={() => navigate('/table')}>
+        Volver
       </Button>
     </div>
   )
