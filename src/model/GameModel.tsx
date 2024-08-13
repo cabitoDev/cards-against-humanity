@@ -5,6 +5,7 @@ export type CardType = {
 
 export type stateType = {
   game: GameType
+  player: string
 }
 
 export type GameType = {
@@ -12,6 +13,7 @@ export type GameType = {
   owner: PlayerType
   players: PlayerType[]
   cards: CardType[]
+  state: string
 }
 
 export type GameRequestType = {

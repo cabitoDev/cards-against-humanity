@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { gameApi } from '../api/gameApi'
 import { useDispatch } from 'react-redux'
 import { updateGame } from '../redux/gameSlice'
+import { updatePlayer } from '../redux/playerSlice'
 
 export const useJoinGame = () => {
   const dispatch = useDispatch()
@@ -13,6 +14,7 @@ export const useJoinGame = () => {
       .then(response => {
         console.log('Joined into game:', response.data)
         dispatch(updateGame(response.data))
+        dispatch(updatePlayer(playerName))
       })
     navigate(`/table`)
   }

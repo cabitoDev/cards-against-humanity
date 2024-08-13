@@ -13,9 +13,11 @@ import {
 import storage from 'redux-persist/lib/storage'
 
 import gameReducer from './gameSlice'
+import playerReducer from './playerSlice'
 
 const rootReducer = combineReducers({
-  game: gameReducer
+  game: gameReducer,
+  player: playerReducer
 })
 
 const persistConfig = {

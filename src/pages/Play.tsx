@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@nextui-org/react'
-import { Client } from '@stomp/stompjs' // Cambia la importación aquí
 import { stateType } from '../model/GameModel'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateGame } from '../redux/gameSlice'
@@ -8,72 +7,63 @@ import { useStompClient, useSubscription } from 'react-stomp-hooks'
 
 export const Play = () => {
   const game = useSelector((state: stateType) => state.game)
+  const myPlayer = useSelector((state: stateType) => state.player)
+  const imOwner = myPlayer === game.owner.name
   const dispatch = useDispatch()
-  const [client, setClient] = useState<Client | null>(null)
-
   const stompClient = useStompClient()
 
-  const publishMessage = () => {
+  const startGame = () => {
+    publishMessage('updateGameState', 'PLAYING')
+  }
+
+  useEffect(() => {
+    publishMessage('addPlayer', myPlayer)
+  }, [])
+
+  const publishMessage = (destination: string, info: string) => {
     if (stompClient) {
       stompClient.publish({
-        destination: '/app/broadcast',
-        body: 'Hello World'
+        destination: `/app/${destination}/${game.id}`,
+        body: info
       })
     }
   }
-  // Subscribe to the topic that we have opened in our spring boot app
-  useSubscription('/topic/reply', message => {
+
+  useSubscription(`/topic/updatedGame/${game.id}`, message => {
+    dispatch(updateGame(JSON.parse(message.body)))
     console.log(message.body)
   })
+  useSubscription(`/topic/updatedGameState/${game.id}`, message => {
+    dispatch(updateGame({ ...game, state: JSON.parse(message.body) }))
+    console.log(message.body)
+    console.log(myPlayer, ' ha empezado el juego')
+  })
 
-  const dealCards = () => {
-    if (client && client.connected && game) {
-      // Verifica si el cliente está conectado
-      client.publish({
-        destination: '/app/dealCards',
-        body: JSON.stringify(game)
-      })
-    } else {
-      console.error('No se puede enviar el mensaje: Cliente no está conectado.')
-    }
-  }
-
-  const playCard = (cardId: number) => {
-    if (client && game) {
-      const playRequest = {
-        gameId: game.id,
-        playerId: 'playerId', // Aquí debe ir el ID del jugador actual
-        cardId: cardId
-      }
-      client.publish({
-        destination: '/app/playCard',
-        body: JSON.stringify(playRequest)
-      })
-    }
-  }
-
-  const selectWinner = () => {
-    if (client && game) {
-      client.publish({ destination: '/app/selectWinner', body: game.id })
-    }
-  }
+  useSubscription(`/topic/addedPlayer/${game.id}`, message => {
+    dispatch(updateGame({ ...game, players: [...game.players, message.body] }))
+    console.log(message.body, ' se ha unido a la partida.')
+  })
 
   return (
     <div>
       <h1>Juego en Progreso</h1>
-      <div onClick={publishMessage}> Send message </div>
-
-      <div>
-        {game &&
-          game.cards &&
-          game.cards.map(card => (
-            <Button key={card.id} onClick={() => playCard(card.id)}>
-              {card.text}
-            </Button>
-          ))}
-      </div>
-      <Button onClick={dealCards}>Repartir Cartas</Button>
-      <Button onClick={selectWinner}>Seleccionar Ganador</Button>
+      {imOwner && game.state === 'WAITING' && (
+        <Button onClick={startGame}>Empezar</Button>
+      )}
+      {game.state === 'PLAYING' && (
+        <div>
+          <div
+            onClick={() => publishMessage('updateGame', JSON.stringify(game))}
+          ></div>
+          <div>
+            {game &&
+              game.cards &&
+              game.cards.map(card => (
+                <Button key={card.id}>{card.text}</Button>
+              ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
