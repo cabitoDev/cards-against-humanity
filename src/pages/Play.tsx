@@ -34,7 +34,7 @@ export const Play = () => {
     console.log(message.body)
   })
   useSubscription(`/topic/updatedGameState/${game.id}`, message => {
-    dispatch(updateGame({ ...game, state: JSON.parse(message.body) }))
+    dispatch(updateGame({ ...game, state: message.body }))
     console.log(message.body)
     console.log(myPlayer, ' ha empezado el juego')
   })
