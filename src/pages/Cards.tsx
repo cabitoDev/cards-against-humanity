@@ -14,7 +14,7 @@ export const Cards = () => {
   return (
     <div>
       Cartas
-      {game.cards.map((card: CardType) => {
+      {game.whiteCards.map((card: CardType) => {
         return (
           <div key={card.id}>
             <div>{card.text}</div>
@@ -22,7 +22,7 @@ export const Cards = () => {
               onClick={() =>
                 putGame({
                   ...game,
-                  cards: game.cards.filter(
+                  whiteCards: game.whiteCards.filter(
                     (deleteCard: CardType) => deleteCard.id !== card.id
                   )
                 })
@@ -34,13 +34,14 @@ export const Cards = () => {
         )
       })}
       <Input
+        autoFocus={true}
         value={newCard}
         onChange={ev => setNewCard(ev.currentTarget.value)}
       />
       <Button
         isDisabled={newCard.length === 0}
         onClick={() => {
-          putGame({ ...game, cards: [...game.cards, newCard] })
+          putGame({ ...game, whiteCards: [...game.whiteCards, newCard] })
           setNewCard('')
         }}
       >

@@ -1,48 +1,35 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@nextui-org/react'
-import { stateType } from '../model/GameModel'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateGame } from '../redux/gameSlice'
-import { useStompClient, useSubscription } from 'react-stomp-hooks'
+import { GameType, stateType } from '../model/GameModel'
+import { useSelector } from 'react-redux'
+import { useSocket } from '../hooks/useSocket'
 
 export const Play = () => {
   const game = useSelector((state: stateType) => state.game)
-  const myPlayer = useSelector((state: stateType) => state.player)
-  const imOwner = myPlayer === game.owner.name
-  const dispatch = useDispatch()
-  const stompClient = useStompClient()
+  const myPlayerName = useSelector((state: stateType) => state.player)
+
+  const findPlayer = (player: string, game: GameType) => {
+    const retPlayer = game.players.find(p => p.name === player)
+    return retPlayer
+  }
+
+  const [myPlayer, setMyPlayer] = useState(findPlayer(myPlayerName, game))
+  const imOwner = myPlayerName === game.owner.name
+  const { publishMessage } = useSocket()
+
+  useEffect(() => {
+    setMyPlayer(findPlayer(myPlayerName, game))
+  }, [game])
 
   const startGame = () => {
-    publishMessage('updateGameState', 'PLAYING')
+    publishMessage('startGame', JSON.stringify(game))
   }
 
   useEffect(() => {
-    publishMessage('addPlayer', myPlayer)
-  }, [])
-
-  const publishMessage = (destination: string, info: string) => {
-    if (stompClient) {
-      stompClient.publish({
-        destination: `/app/${destination}/${game.id}`,
-        body: info
-      })
+    if (!game.players.find(p => p.name === myPlayerName)) {
+      publishMessage('addPlayer', myPlayerName)
     }
-  }
-
-  useSubscription(`/topic/updatedGame/${game.id}`, message => {
-    dispatch(updateGame(JSON.parse(message.body)))
-    console.log(message.body)
-  })
-  useSubscription(`/topic/updatedGameState/${game.id}`, message => {
-    dispatch(updateGame({ ...game, state: message.body }))
-    console.log(message.body)
-    console.log(myPlayer, ' ha empezado el juego')
-  })
-
-  useSubscription(`/topic/addedPlayer/${game.id}`, message => {
-    dispatch(updateGame({ ...game, players: [...game.players, message.body] }))
-    console.log(message.body, ' se ha unido a la partida.')
-  })
+  }, [])
 
   return (
     <div>
@@ -57,13 +44,15 @@ export const Play = () => {
           ></div>
           <div>
             {game &&
-              game.cards &&
-              game.cards.map(card => (
+              game.whiteCards &&
+              game.whiteCards.map(card => (
                 <Button key={card.id}>{card.text}</Button>
               ))}
           </div>
         </div>
       )}
+      {myPlayer &&
+        myPlayer.hand.map(card => <div key={card.id}>{card.text}</div>)}
     </div>
   )
 }
